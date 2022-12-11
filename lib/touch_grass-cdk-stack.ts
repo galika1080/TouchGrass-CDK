@@ -4,6 +4,7 @@ import { Code } from 'aws-cdk-lib/aws-lambda';
 
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 import { LambdaHttpApi } from './lambda-http-api';
 
@@ -40,6 +41,35 @@ export class TouchGrassCdkStack extends Stack {
       name: 'GetUserTags',
       route: '/get-user-tags',
       handler: 'com.touchgrass.lambda.GetUserTags',
+      code: javaLambdaCode,
+      memorySize: 512,
+      timeout: Duration.seconds(16)
+    });
+
+    const getAllEvents = new LambdaHttpApi(this, 'GetAllEvents', {
+      name: 'GetAllEvents',
+      route: '/get-all-events',
+      handler: 'com.touchgrass.lambda.GetEvents',
+      code: javaLambdaCode,
+      memorySize: 512,
+      timeout: Duration.seconds(16)
+    });
+
+    const getSuggestedEvents = new LambdaHttpApi(this, 'GetSuggestedEvents', {
+      name: 'GetSuggestedEvents',
+      route: '/get-suggested-events',
+      handler: 'com.touchgrass.lambda.GetSuggestedEvents',
+      code: javaLambdaCode,
+      memorySize: 512,
+      timeout: Duration.seconds(16)
+    });
+
+
+    // Event-scraping Lambda
+    const scrapeEvents = new lambda.Function(this, 'ScrapeEvents', {
+      functionName: 'ScrapeEvents',
+      runtime: lambda.Runtime.JAVA_11,
+      handler: 'com.touchgrass.lambda.ScrapeEvents',
       code: javaLambdaCode,
       memorySize: 512,
       timeout: Duration.seconds(16)
